@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // 1. Connect to your specific Supabase project
-const supabaseUrl = 'mjdarfyzednoohsiasgk';
-const supabaseKey = 'mjdarfyzednoohsiasgk';
+const supabaseUrl = 'https://mjdarfyzednoohsiasgk.supabase.co';
+const supabaseKey = 'sb_publishable_XZZclcaMl2PMa5WVgx9m0A_MXGvl3_z';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // 2. The function to get coupons by brand name
