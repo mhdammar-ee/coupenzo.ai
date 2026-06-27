@@ -3,40 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coupenzo.ai - Live Coupon Chatbot</title>
-    <!-- Load standard libraries cleanly in the HTML head -->
+    <title>Coupenzo.ai — Premium Coupon Assistant</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        body { background-color: #ffffff; font-family: sans-serif; }
+        body { 
+            background-color: #fcfcf9; 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            scroll-behavior: smooth;
+        }
+        /* Custom smooth scrollbar behavior for chat look */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #e4e4e7;
+            border-radius: 2px;
+        }
     </style>
 </head>
-<body class="flex flex-col h-screen max-w-2xl mx-auto border-x border-gray-200">
+<body class="bg-zinc-50 text-zinc-800 antialiased h-screen flex flex-col lg:flex-row overflow-hidden">
 
-    <!-- Header -->
-    <header class="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h1 class="text-xl font-bold text-gray-800 tracking-tight">coupenzo<span class="text-emerald-500">.ai</span></h1>
-        <span class="text-xs bg-emerald-50 text-emerald-600 px-2 py-1 rounded-full font-medium">Supabase Connected</span>
+    <header class="lg:hidden w-full bg-white border-b border-zinc-100 p-4 flex items-center justify-between z-50 shrink-0">
+        <h1 class="text-xl font-bold tracking-tight text-zinc-900">coupenzo<span class="text-emerald-500">.ai</span></h1>
+        <button id="menu-toggle" class="p-2 text-zinc-500 hover:text-zinc-900 focus:outline-none cursor-pointer">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
     </header>
 
-    <!-- Chat Box -->
-    <main id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4">
-        <div class="flex items-start gap-2 max-w-[85%]">
-            <div class="bg-gray-100 text-gray-800 rounded-2xl p-3 text-sm">
-                👋 Hello! Welcome back to Coupenzo.ai. Type any brand name from your database (like <span class="font-semibold text-emerald-600">Geekbuying</span> or <span class="font-semibold text-emerald-600">Gamivo</span>) to instantly pull live deals and coupons!
+    <aside id="sidebar" class="fixed inset-y-0 left-0 -translate-x-full lg:translate-x-0 lg:static w-72 lg:w-80 bg-white border-r border-zinc-100 flex flex-col justify-between z-40 transition-transform duration-300 ease-in-out shrink-0 shadow-xl lg:shadow-none">
+        <div class="flex flex-col h-full">
+            <div class="hidden lg:flex p-6 border-b border-zinc-50 items-center justify-between">
+                <h1 class="text-2xl font-extrabold tracking-tight text-zinc-900">coupenzo<span class="text-emerald-500">.ai</span></h1>
+                <span class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium border border-emerald-100">Live</span>
+            </div>
+
+            <div class="flex-1 p-6 overflow-y-auto custom-scroll">
+                <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">Recent Searches</h3>
+                <div id="history-container" class="space-y-1">
+                    <p id="empty-history-text" class="text-xs text-zinc-400 font-light italic p-2">Your verified search history will populate right here.</p>
+                </div>
             </div>
         </div>
-    </main>
 
-    <!-- Search Input Form -->
-    <form id="chat-form" class="p-4 border-t border-gray-100 flex gap-2 bg-white sticky bottom-0">
-        <input type="text" id="user-input" placeholder="Type a brand name..." required
-               class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500 transition-colors">
-        <button type="submit" 
-                class="bg-emerald-500 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors cursor-pointer">
-            Search
-        </button>
-    </form>
+        <div class="p-6 bg-zinc-50/50 border-t border-zinc-100">
+            <div class="flex items-center gap-2.5">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <p class="text-xs text-zinc-500 font-medium tracking-wide">Relational Engine Connected</p>
+            </div>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 z-30 hidden transition-opacity duration-300 lg:hidden"></div>
+
+    <main class="flex-1 flex flex-col h-full bg-white relative overflow-hidden">
+        
+        <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll pb-24">
+            <div class="flex items-start gap-3 max-w-xl transition-all duration-300">
+                <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm select-none">AI</div>
+                <div class="bg-zinc-50 text-zinc-800 rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed shadow-sm border border-zinc-100/50">
+                    👋 Hello! Welcome back to Coupenzo.ai. Type any brand name from your database (like <span class="font-semibold text-emerald-600">Geekbuying</span> or <span class="font-semibold text-emerald-600">Gamivo</span>) to instantly pull live deals and coupons!
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
+            <form id="chat-form" class="max-w-2xl mx-auto flex gap-2 bg-white p-1.5 border border-zinc-200/80 rounded-2xl shadow-lg shadow-zinc-100/50 pointer-events-auto transition-all duration-300 focus-within:border-emerald-500/50 focus-within:shadow-emerald-50/30">
+                <input type="text" id="user-input" placeholder="Type a brand name..." required autoComplete="off"
+                       class="flex-1 px-4 py-3 bg-transparent text-sm text-zinc-800 font-normal focus:outline-none">
+                <button type="submit" 
+                        class="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors duration-200 cursor-pointer shadow-sm shrink-0">
+                    Search
+                </button>
+            </form>
+        </div>
+
+    </main>
 
     <script>
         // Verified Project Setup Credentials
@@ -49,16 +94,59 @@
         const targetChatBox = document.getElementById('chat-box');
         const targetChatForm = document.getElementById('chat-form');
         const targetUserInput = document.getElementById('user-input');
+        
+        // Mobile Navigation Drawer Selector DOM Elements
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const historyContainer = document.getElementById('history-container');
+        const emptyHistoryText = document.getElementById('empty-history-text');
 
-        targetChatForm.addEventListener('submit', async (e) => {
+        // Search history data tracker stack array profile
+        let searchHistorySet = new Set();
+
+        // Responsive mobile side panel toggles
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        }
+        menuToggle.addEventListener('click', toggleMobileMenu);
+        sidebarOverlay.addEventListener('click', toggleMobileMenu);
+
+        // Function helper to append entries dynamically to history panel list UI
+        function updateHistoryUi(brandName) {
+            const formattedBrand = brandName.trim();
+            if (searchHistorySet.has(formattedBrand.toLowerCase())) return;
+            
+            searchHistorySet.add(formattedBrand.toLowerCase());
+            if (emptyHistoryText) emptyHistoryText.remove();
+
+            const historyBtn = document.createElement('button');
+            historyBtn.className = "w-full text-left text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 px-3 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 cursor-pointer group animate-fade-in";
+            historyBtn.innerHTML = `
+                <svg class="w-3.5 h-3.5 text-zinc-400 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="truncate">${formattedBrand}</span>
+            `;
+            
+            // Fast trigger callback sequence when user selects an anchor string from history panel list UI
+            historyBtn.addEventListener('click', () => {
+                if (!sidebar.classList.contains('-translate-x-full')) toggleMobileMenu();
+                executeDatabaseQuerySearch(formattedBrand);
+            });
+
+            historyContainer.insertBefore(historyBtn, historyContainer.firstChild);
+        }
+
+        targetChatForm.addEventListener('submit', (e) => {
             e.preventDefault();
-
             const searchPhrase = targetUserInput.value.trim();
             if (!searchPhrase) return;
-
-            displayMessage(searchPhrase, true);
             targetUserInput.value = '';
+            executeDatabaseQuerySearch(searchPhrase);
+        });
 
+        async function executeDatabaseQuerySearch(searchPhrase) {
+            displayMessage(searchPhrase, true);
             const loadingTrackerId = displayLoadingBubble();
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
 
@@ -74,23 +162,26 @@
                 }
 
                 const currentStore = matchedStoreArray[0];
-                const storeIdToFind = currentStore.id; // Yeh numeric ID hai (e.g., 1, 2, 3)
+                const storeIdToFind = currentStore.id;
+
+                // Push clean store results record into sidebar history profile layout loop
+                updateHistoryUi(currentStore.name);
 
                 // STEP 2: Fetch coupons where 'store' column matches the store's ID number exactly
                 const { data: activeCoupons, error: couponFetchError } = await dbClient
                     .from('Coupons')
                     .select('name, offer, coupon_code, tracking_url, store')
-                    .eq('store', storeIdToFind); // Direct numeric matching!
+                    .eq('store', storeIdToFind);
 
                 const loaderNode = document.getElementById(loadingTrackerId);
                 if (loaderNode) loaderNode.remove();
 
                 if (couponFetchError || !activeCoupons || activeCoupons.length === 0) {
-                    displayMessage(`I found the store **${currentStore.name}**, but there are no active coupon codes assigned to its ID (${storeIdToFind}) right now.`, false);
+                    displayMessage(`I found the store **${currentStore.name}**, but there are no active coupon codes assigned to its ID row data right now.`, false);
                     return;
                 }
 
-                // STEP 3: Render the coupon cards
+                // STEP 3: Render the conversational reply and data card loop entries
                 displayMessage(`Here are the latest verified offers found for **${currentStore.name}**:`, false);
                 
                 activeCoupons.forEach(deal => {
@@ -111,15 +202,34 @@
                 displayMessage(`I searched our database for "${searchPhrase}" but couldn't find a matching store name. Check your spelling or table entries!`, false);
             }
 
-            targetChatBox.scrollTop = targetChatBox.scrollHeight;
-        });
+            // Smooth container offset vector scroll adjustments
+            setTimeout(() => {
+                targetChatBox.scrollTo({
+                    top: targetChatBox.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 50);
+        }
 
         function displayMessage(textBody, isUserSender) {
             const rowWrapper = document.createElement('div');
-            rowWrapper.className = isUserSender ? "flex items-start justify-end gap-2" : "flex items-start gap-2 max-w-[85%]";
+            rowWrapper.className = isUserSender ? "flex items-start justify-end gap-3 w-full animate-fade-in" : "flex items-start gap-3 max-w-xl animate-fade-in";
+            
+            const avatar = document.createElement('div');
+            avatar.className = isUserSender 
+                ? "hidden" 
+                : "w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm select-none";
+            avatar.innerText = isUserSender ? "" : "AI";
+
             const messageBubble = document.createElement('div');
-            messageBubble.className = isUserSender ? "bg-emerald-500 text-white rounded-2xl p-3 text-sm max-w-[85%]" : "bg-gray-100 text-gray-800 rounded-2xl p-3 text-sm";
-            messageBubble.innerHTML = textBody;
+            messageBubble.className = isUserSender 
+                ? "bg-zinc-900 text-white rounded-2xl rounded-tr-sm p-4 text-sm leading-relaxed shadow-md shadow-zinc-100 max-w-[85%]" 
+                : "bg-zinc-50 text-zinc-800 rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed shadow-sm border border-zinc-100/50";
+            
+            // Match markdown double asterisk strings cleanly to parse into bold text wrappers dynamically
+            messageBubble.innerHTML = textBody.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold text-emerald-500">$1</strong>');
+            
+            if(!isUserSender) rowWrapper.appendChild(avatar);
             rowWrapper.appendChild(messageBubble);
             targetChatBox.appendChild(rowWrapper);
         }
@@ -128,28 +238,34 @@
             const targetId = 'load-' + Date.now();
             const loadingRow = document.createElement('div');
             loadingRow.id = targetId;
-            loadingRow.className = "flex items-start gap-2 animate-pulse";
-            loadingRow.innerHTML = `<div class="bg-gray-100 text-gray-400 rounded-2xl p-3 text-sm">Searching database fields...</div>`;
+            loadingRow.className = "flex items-start gap-3 max-w-xl animate-pulse";
+            loadingRow.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-400 flex items-center justify-center text-xs font-bold shrink-0 select-none">AI</div>
+                <div class="bg-zinc-50 text-zinc-400 rounded-2xl rounded-tl-sm p-4 text-sm border border-zinc-100/50 italic">
+                    Querying secure relational tables...
+                </div>
+            `;
             targetChatBox.appendChild(loadingRow);
             return targetId;
         }
 
         function buildCouponUiCard(dataObject) {
             const templateCard = document.createElement('div');
-            templateCard.className = "border border-gray-200 rounded-2xl p-4 bg-white max-w-[85%] ml-7 shadow-sm transition-all hover:shadow-md border-l-4 border-l-emerald-500 my-2";
+            templateCard.className = "border border-zinc-200/80 rounded-2xl p-5 bg-white max-w-md ml-11 shadow-sm transition-all duration-300 hover:shadow-md hover:border-zinc-300 border-l-4 border-l-emerald-500 my-3 animate-fade-in";
             templateCard.innerHTML = `
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-emerald-600 font-extrabold text-base tracking-wide">${dataObject.discount}</span>
-                    <span class="text-[10px] text-gray-400 font-medium bg-gray-50 px-2 py-0.5 rounded border border-gray-100">VERIFIED TODAY</span>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-emerald-600 font-extrabold text-sm tracking-wider uppercase">${dataObject.discount}</span>
+                    <span class="text-[10px] text-zinc-400 font-medium bg-zinc-50 px-2 py-0.5 rounded border border-zinc-100">VERIFIED TODAY</span>
                 </div>
-                <h3 class="text-sm font-semibold text-gray-800 mb-3">${dataObject.title}</h3>
+                <h3 class="text-sm font-semibold text-zinc-900 mb-4 leading-snug">${dataObject.title}</h3>
                 <div class="flex gap-2 items-center">
-                    <div onclick="navigator.clipboard.writeText('${dataObject.code}'); alert('Code copied to clipboard! Opening link...'); window.open('${dataObject.link}', '_blank');" 
-                         class="flex-1 border-2 border-dashed border-gray-200 hover:border-emerald-500 rounded-xl p-2 text-center font-mono font-bold text-gray-700 bg-gray-50 text-xs cursor-pointer select-none transition-colors">
+                    <div onclick="navigator.clipboard.writeText('${dataObject.code}'); alert('Coupon code copied to clipboard! Opening link tracking url...'); window.open('${dataObject.link}', '_blank');" 
+                         title="Click to copy code instantly"
+                         class="flex-1 border border-dashed border-zinc-300 hover:border-emerald-500 hover:bg-emerald-50/20 rounded-xl p-2.5 text-center font-mono font-bold text-zinc-700 bg-zinc-50 text-xs cursor-pointer select-none transition-all duration-200">
                         ${dataObject.code}
                     </div>
-                    <a href="${dataObject.link}" target="_blank" class="bg-gray-900 text-white text-xs font-semibold px-3 py-2.5 rounded-xl hover:bg-gray-800 transition-colors shrink-0">
-                        Open Link
+                    <a href="${dataObject.link}" target="_blank" class="bg-zinc-900 text-white text-xs font-semibold px-4 py-3 rounded-xl hover:bg-emerald-600 transition-colors duration-200 shrink-0 shadow-sm">
+                        Open Offer
                     </a>
                 </div>
             `;
