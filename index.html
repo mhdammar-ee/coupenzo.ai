@@ -59,16 +59,14 @@
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
 
             try {
-                // Clean the text to remove unintended spaces
                 const cleanQuery = searchPhrase.trim();
 
-                // STEP 1: Search the 'Stores' table with a broad wildcard filter
+                // STEP 1: Fetch the complete store registry list
                 const { data: matchedStoreArray, error: storeFetchError } = await dbClient
                     .from('Stores')
                     .select('id, name, tracking_url');
 
                 if (storeFetchError || !matchedStoreArray || matchedStoreArray.length === 0) {
-                    console.log("Database connection error or completely empty table:", storeFetchError);
                     throw new Error("Store could not be found or returned empty results");
                 }
 
@@ -82,21 +80,23 @@
                     throw new Error("Store could not be found or returned empty results");
                 }
 
-                // STEP 2: Fetch related items from the 'Coupons' table using the store field match
+                // STEP 2: Pull down all coupon entries to link them locally
                 const { data: activeCoupons, error: couponFetchError } = await dbClient
                     .from('Coupons')
-                    .select('name, offer, coupon_code, tracking_url');
+                    .select('name, offer, coupon_code, tracking_url, store');
 
                 const loaderNode = document.getElementById(loadingTrackerId);
                 if (loaderNode) loaderNode.remove();
 
-                // Filter coupons that belong to this store name or id safely
-                const filteredCoupons = (activeCoupons || []).filter(c => 
-                    c.store && (
-                        String(c.store).toLowerCase().trim() === currentStore.name.toLowerCase().trim() ||
-                        String(c.store) === String(currentStore.id)
-                    )
-                );
+                // UNIVERSAL MATCHING: Checks if your store column contains the name string OR the numerical ID row
+                const filteredCoupons = (activeCoupons || []).filter(c => {
+                    if (!c.store) return false;
+                    const storeFieldClean = String(c.store).toLowerCase().trim();
+                    const storeNameClean = currentStore.name.toLowerCase().trim();
+                    const storeIdClean = String(currentStore.id).trim();
+
+                    return storeFieldClean === storeNameClean || storeFieldClean === storeIdClean;
+                });
 
                 if (couponFetchError || filteredCoupons.length === 0) {
                     displayMessage(`I found the store **${currentStore.name}**, but there are no active coupon codes assigned to it yet.`, false);
@@ -123,7 +123,6 @@
                 console.error("Internal Diagnostic Exception Details:", runtimeError);
                 displayMessage(`I searched our database for "${searchPhrase}" but couldn't find a matching store name. Check your spelling or table entries!`, false);
             }
-
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
         });
 
