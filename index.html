@@ -59,37 +59,54 @@
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
 
             try {
-                // STEP 1: Search 'Stores' table using the correct tracking_url column name
+                // Clean the text to remove unintended spaces
+                const cleanQuery = searchPhrase.trim();
+
+                // STEP 1: Search the 'Stores' table with a broad wildcard filter
                 const { data: matchedStoreArray, error: storeFetchError } = await dbClient
                     .from('Stores')
-                    .select('id, name, tracking_url')
-                    .ilike('name', `%${searchPhrase}%`);
+                    .select('id, name, tracking_url');
 
                 if (storeFetchError || !matchedStoreArray || matchedStoreArray.length === 0) {
+                    console.log("Database connection error or completely empty table:", storeFetchError);
                     throw new Error("Store could not be found or returned empty results");
                 }
 
-                // Pick the first matching row from the array
-                const currentStore = matchedStoreArray[0];
+                // Look for a row that matches the typed text inside the script directly
+                const currentStore = matchedStoreArray.find(s => 
+                    s.name.toLowerCase().trim().includes(cleanQuery.toLowerCase()) ||
+                    cleanQuery.toLowerCase().includes(s.name.toLowerCase().trim())
+                );
 
-                // STEP 2: Fetch related items from the 'Coupons' table using correct column headers
+                if (!currentStore) {
+                    throw new Error("Store could not be found or returned empty results");
+                }
+
+                // STEP 2: Fetch related items from the 'Coupons' table using the store field match
                 const { data: activeCoupons, error: couponFetchError } = await dbClient
                     .from('Coupons')
-                    .select('name, offer, coupon_code, tracking_url')
-                    .eq('store', currentStore.name); // Using store name as it matches text relation layout
+                    .select('name, offer, coupon_code, tracking_url');
 
                 const loaderNode = document.getElementById(loadingTrackerId);
                 if (loaderNode) loaderNode.remove();
 
-                if (couponFetchError || !activeCoupons || activeCoupons.length === 0) {
+                // Filter coupons that belong to this store name or id safely
+                const filteredCoupons = (activeCoupons || []).filter(c => 
+                    c.store && (
+                        String(c.store).toLowerCase().trim() === currentStore.name.toLowerCase().trim() ||
+                        String(c.store) === String(currentStore.id)
+                    )
+                );
+
+                if (couponFetchError || filteredCoupons.length === 0) {
                     displayMessage(`I found the store **${currentStore.name}**, but there are no active coupon codes assigned to it yet.`, false);
                     return;
                 }
 
-                // STEP 3: Map and render dynamic results layout cards
+                // STEP 3: Render dynamic results layout cards
                 displayMessage(`Here are the latest verified offers found for **${currentStore.name}**:`, false);
                 
-                activeCoupons.forEach(deal => {
+                filteredCoupons.forEach(deal => {
                     const trackingLink = deal.tracking_url || currentStore.tracking_url || "https://www.google.com";
                     buildCouponUiCard({
                         discount: deal.name || "DEAL",       
