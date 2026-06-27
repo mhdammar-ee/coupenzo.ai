@@ -58,37 +58,43 @@
             const loadingTrackerId = displayLoadingBubble();
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
 
-            try {
-                // STEP 1: Fetch store data from 'Stores' table
+           try {
+                // STEP 1: Search the 'Stores' table cleanly using explicit filter rules
                 const { data: matchedStore, error: storeFetchError } = await dbClient
                     .from('Stores')
                     .select('id, name, tracking_ur')
-                    .ilike('name', `%${searchPhrase}%`)
-                    .maybeSingle();
+                    .ilike('name', `%${searchPhrase}%`);
 
-                if (storeFetchError || !matchedStore) {
+                // If Supabase throws an error or the array comes back completely empty
+                if (storeFetchError || !matchedStore || matchedStore.length === 0) {
+                    console.log("Detailed Debug Internal Store Error:", storeFetchError);
                     throw new Error("Store could not be found");
                 }
 
-                // STEP 2: Fetch corresponding coupons from 'Coupons' table
+                // Pick the first matching store row from the returned array list
+                const currentStore = matchedStore[0];
+
+                // STEP 2: Fetch related coupon cards from uppercase 'Coupons' table
                 const { data: activeCoupons, error: couponFetchError } = await dbClient
                     .from('Coupons')
                     .select('name, offer, coupon_co, tracking_ur')
-                    .eq('store', matchedStore.id);
+                    .eq('store', currentStore.id);
 
+                // Clean up the running loader element bubble safely
                 const loaderNode = document.getElementById(loadingTrackerId);
                 if (loaderNode) loaderNode.remove();
 
                 if (couponFetchError || !activeCoupons || activeCoupons.length === 0) {
-                    displayMessage(`I found the store **${matchedStore.name}**, but there are no active coupon codes assigned to it yet.`, false);
+                    displayMessage(`I found the store **${currentStore.name}** in our records, but there are no live coupon codes mapped to its ID row right now.`, false);
                     return;
                 }
 
-                // STEP 3: Display matching coupons
-                displayMessage(`Here are the latest verified offers found for **${matchedStore.name}**:`, false);
+                // STEP 3: Map and display results cleanly
+                displayMessage(`Here are the latest verified offers found for **${currentStore.name}**:`, false);
                 
                 activeCoupons.forEach(deal => {
-                    const trackingLink = deal.tracking_ur || matchedStore.tracking_ur || "https://www.google.com";
+                    // Safety check to use the store link if the individual coupon link field is null
+                    const trackingLink = deal.tracking_ur || currentStore.tracking_ur || "https://www.google.com";
                     buildCouponUiCard({
                         discount: deal.name || "DEAL",       
                         title: deal.offer || "Special Offer", 
@@ -101,7 +107,7 @@
                 const loaderNode = document.getElementById(loadingTrackerId);
                 if (loaderNode) loaderNode.remove();
 
-                console.log("Internal DB Log context:", runtimeError);
+                console.log("Console API Runtime Exception Tracer:", runtimeError);
                 displayMessage(`I searched our database for "${searchPhrase}" but couldn't find a matching store. Check your spelling or table entries!`, false);
             }
 
