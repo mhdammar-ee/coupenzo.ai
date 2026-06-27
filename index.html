@@ -59,10 +59,10 @@
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
 
             try {
-                // STEP 1: Search the 'Stores' table using explicit array matching formatting rules
+                // STEP 1: Search 'Stores' table using the correct tracking_url column name
                 const { data: matchedStoreArray, error: storeFetchError } = await dbClient
                     .from('Stores')
-                    .select('id, name, tracking_ur')
+                    .select('id, name, tracking_url')
                     .ilike('name', `%${searchPhrase}%`);
 
                 if (storeFetchError || !matchedStoreArray || matchedStoreArray.length === 0) {
@@ -72,11 +72,11 @@
                 // Pick the first matching row from the array
                 const currentStore = matchedStoreArray[0];
 
-                // STEP 2: Fetch related items from the uppercase 'Coupons' table matching its ID row
+                // STEP 2: Fetch related items from the 'Coupons' table using correct column headers
                 const { data: activeCoupons, error: couponFetchError } = await dbClient
                     .from('Coupons')
-                    .select('name, offer, coupon_co, tracking_ur')
-                    .eq('store', currentStore.id);
+                    .select('name, offer, coupon_code, tracking_url')
+                    .eq('store', currentStore.name); // Using store name as it matches text relation layout
 
                 const loaderNode = document.getElementById(loadingTrackerId);
                 if (loaderNode) loaderNode.remove();
@@ -90,11 +90,11 @@
                 displayMessage(`Here are the latest verified offers found for **${currentStore.name}**:`, false);
                 
                 activeCoupons.forEach(deal => {
-                    const trackingLink = deal.tracking_ur || currentStore.tracking_ur || "https://www.google.com";
+                    const trackingLink = deal.tracking_url || currentStore.tracking_url || "https://www.google.com";
                     buildCouponUiCard({
                         discount: deal.name || "DEAL",       
                         title: deal.offer || "Special Offer", 
-                        code: deal.coupon_co || "GET DEAL",  
+                        code: deal.coupon_code || "GET DEAL",  
                         link: trackingLink
                     });
                 });
@@ -104,7 +104,7 @@
                 if (loaderNode) loaderNode.remove();
 
                 console.error("Internal Diagnostic Exception Details:", runtimeError);
-                displayMessage(`I searched our database for "${searchPhrase}" but couldn't find a matching store name. Make sure it matches your table row spelling!`, false);
+                displayMessage(`I searched our database for "${searchPhrase}" but couldn't find a matching store name. Check your spelling or table entries!`, false);
             }
 
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
