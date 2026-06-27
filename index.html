@@ -35,123 +35,123 @@
     </form>
 
     <script>
-        // 1. CONNECT TO YOUR LIVE SUPABASE PROJECT
-        // Replace these placeholders with the actual Project URL and Anon Key from your Supabase ⚙️ Settings -> API tab
-        const SUPABASE_URL = "https://mjdarfyzednoohsiasgk.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_XZZclcaMl2PMa5WVgx9m0A_MXGvl3_z";
+        // Your real project URL built from your Project ID
+        const myProjectUrl = "https://mjdarfyzednoohsiasgk.supabase.co";
         
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // CRITICAL: Paste your long anon key string inside these quotes (starts with eyJ...)
+        const myAnonKey = "sb_publishable_XZZclcaMl2PMa5WVgx9m0A_MXGvl3_z";
+        
+        // Connecting using clean, non-duplicate variable names
+        const dbClient = Supabase.createClient(myProjectUrl, myAnonKey);
 
-        const chatBox = document.getElementById('chat-box');
-        const chatForm = document.getElementById('chat-form');
-        const userInput = document.getElementById('user-input');
+        const targetChatBox = document.getElementById('chat-box');
+        const targetChatForm = document.getElementById('chat-form');
+        const targetUserInput = document.getElementById('user-input');
 
-        chatForm.addEventListener('submit', async (e) => {
+        targetChatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const text = userInput.value.trim();
-            if (!text) return;
+            const searchPhrase = targetUserInput.value.trim();
+            if (!searchPhrase) return;
 
-            // Append User Message
-            appendMessage(text, true);
-            userInput.value = '';
+            // Append the message typed by user
+            displayMessage(searchPhrase, true);
+            targetUserInput.value = '';
 
-            // Show Loading State
-            const loadingId = appendLoading();
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // Show a clean loading indicator
+            const loadingTrackerId = displayLoadingBubble();
+            targetChatBox.scrollTop = targetChatBox.scrollHeight;
 
             try {
-                // STEP 1: Search the 'Stores' table for a matching name
-                const { data: storeData, error: storeError } = await supabase
+                // STEP 1: Fetch store matching the exact layout case
+                const { data: matchedStore, error: storeFetchError } = await dbClient
                     .from('Stores')
                     .select('id, name, tracking_ur')
-                    .ilike('name', `%${text}%`) // Finds matches even with partial text or different capitalization
-                    .single(); // Expect one matching store row
+                    .ilike('name', `%${searchPhrase}%`)
+                    .maybeSingle();
 
-                if (storeError || !storeData) {
-                    throw new Error("Store not found");
+                if (storeFetchError || !matchedStore) {
+                    throw new Error("Store could not be found");
                 }
 
-                // STEP 2: Use the store's ID number to fetch all related entries from the 'Coupons' table
-                const { data: coupons, error: couponError } = await supabase
+                // STEP 2: Fetch related items from Coupons table
+                const { data: activeCoupons, error: couponFetchError } = await dbClient
                     .from('Coupons')
                     .select('name, offer, coupon_co, tracking_ur')
-                    .eq('store', storeData.id); // Matches 'store' ID column from your image_8a7045.png
+                    .eq('store', matchedStore.id);
 
-                // Remove loading element
-                document.getElementById(loadingId).remove();
+                // Clean up the loading bubble safely
+                const loaderNode = document.getElementById(loadingTrackerId);
+                if (loaderNode) loaderNode.remove();
 
-                if (couponError || !coupons || coupons.length === 0) {
-                    appendMessage(`I found the store **${storeData.name}**, but there are no active coupon codes listed for it right now.`, false);
+                if (couponFetchError || !activeCoupons || activeCoupons.length === 0) {
+                    displayMessage(`I found the store **${matchedStore.name}**, but there are no active coupon codes assigned to it yet.`, false);
                     return;
                 }
 
-                // STEP 3: Print conversational reply and render the visual cards
-                appendMessage(`Here are the latest verified offers found for **${storeData.name}**:`, false);
+                // STEP 3: Display results
+                displayMessage(`Here are the latest verified offers found for **${matchedStore.name}**:`, false);
                 
-                coupons.forEach(coupon => {
-                    // Fallback to store deep link if the coupon link itself is empty
-                    const finalLink = coupon.tracking_ur || storeData.tracking_ur || "https://www.google.com";
-                    
-                    appendCouponCard({
-                        discount: coupon.name || "DEAL",       // e.g. "20% OFF" from image_8a70a4
-                        title: coupon.offer || "Special Deal", // e.g. "Enjoy 20% off your first order"
-                        code: coupon.coupon_co || "GET DEAL",  // coupon code string
-                        link: finalLink
+                activeCoupons.forEach(deal => {
+                    const trackingLink = deal.tracking_ur || matchedStore.tracking_ur || "https://www.google.com";
+                    buildCouponUiCard({
+                        discount: deal.name || "DEAL",       
+                        title: deal.offer || "Special Offer", 
+                        code: deal.coupon_co || "GET DEAL",  
+                        link: trackingLink
                     });
                 });
 
-            } catch (err) {
-                // Remove loading element if an error occurs
-                const loadingEl = document.getElementById(loadingId);
-                if (loadingEl) loadingEl.remove();
+            } catch (runtimeError) {
+                const loaderNode = document.getElementById(loadingTrackerId);
+                if (loaderNode) loaderNode.remove();
 
-                console.error(err);
-                appendMessage(`I couldn't find any active stores or coupons matching "${text}" in our database system right now.`, false);
+                console.log("Internal DB Log context:", runtimeError);
+                displayMessage(`I searched our database for "${searchPhrase}" but couldn't find a matching store. Check your spelling or table entries!`, false);
             }
 
-            chatBox.scrollTop = chatBox.scrollHeight;
+            targetChatBox.scrollTop = targetChatBox.scrollHeight;
         });
 
-        function appendMessage(text, isUser) {
-            const wrapper = document.createElement('div');
-            wrapper.className = isUser ? "flex items-start justify-end gap-2" : "flex items-start gap-2 max-w-[85%]";
-            const msg = document.createElement('div');
-            msg.className = isUser ? "bg-emerald-500 text-white rounded-2xl p-3 text-sm max-w-[85%]" : "bg-gray-100 text-gray-800 rounded-2xl p-3 text-sm";
-            msg.innerHTML = text;
-            wrapper.appendChild(msg);
-            chatBox.appendChild(wrapper);
+        function displayMessage(textBody, isUserSender) {
+            const rowWrapper = document.createElement('div');
+            rowWrapper.className = isUserSender ? "flex items-start justify-end gap-2" : "flex items-start gap-2 max-w-[85%]";
+            const messageBubble = document.createElement('div');
+            messageBubble.className = isUserSender ? "bg-emerald-500 text-white rounded-2xl p-3 text-sm max-w-[85%]" : "bg-gray-100 text-gray-800 rounded-2xl p-3 text-sm";
+            messageBubble.innerHTML = textBody;
+            rowWrapper.appendChild(messageBubble);
+            targetChatBox.appendChild(rowWrapper);
         }
 
-        function appendLoading() {
-            const id = 'loading-' + Date.now();
-            const wrapper = document.createElement('div');
-            wrapper.id = id;
-            wrapper.className = "flex items-start gap-2 animate-pulse";
-            wrapper.innerHTML = `<div class="bg-gray-100 text-gray-400 rounded-2xl p-3 text-sm">Searching live relational database...</div>`;
-            chatBox.appendChild(wrapper);
-            return id;
+        function displayLoadingBubble() {
+            const targetId = 'load-' + Date.now();
+            const loadingRow = document.createElement('div');
+            loadingRow.id = targetId;
+            loadingRow.className = "flex items-start gap-2 animate-pulse";
+            loadingRow.innerHTML = `<div class="bg-gray-100 text-gray-400 rounded-2xl p-3 text-sm">Searching records...</div>`;
+            targetChatBox.appendChild(loadingRow);
+            return targetId;
         }
 
-        function appendCouponCard(coupon) {
-            const card = document.createElement('div');
-            card.className = "border border-gray-200 rounded-2xl p-4 bg-white max-w-[85%] ml-7 shadow-sm transition-all hover:shadow-md border-l-4 border-l-emerald-500 my-2";
-            card.innerHTML = `
+        function buildCouponUiCard(dataObject) {
+            const templateCard = document.createElement('div');
+            templateCard.className = "border border-gray-200 rounded-2xl p-4 bg-white max-w-[85%] ml-7 shadow-sm transition-all hover:shadow-md border-l-4 border-l-emerald-500 my-2";
+            templateCard.innerHTML = `
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-emerald-600 font-extrabold text-base tracking-wide">${coupon.discount}</span>
+                    <span class="text-emerald-600 font-extrabold text-base tracking-wide">${dataObject.discount}</span>
                     <span class="text-[10px] text-gray-400 font-medium bg-gray-50 px-2 py-0.5 rounded border border-gray-100">VERIFIED TODAY</span>
                 </div>
-                <h3 class="text-sm font-semibold text-gray-800 mb-3">${coupon.title}</h3>
+                <h3 class="text-sm font-semibold text-gray-800 mb-3">${dataObject.title}</h3>
                 <div class="flex gap-2 items-center">
-                    <div onclick="navigator.clipboard.writeText('${coupon.code}'); alert('Code copied! Opening link tracking url...'); window.open('${coupon.link}', '_blank');" 
+                    <div onclick="navigator.clipboard.writeText('${dataObject.code}'); alert('Code copied to clipboard! Opening link...'); window.open('${dataObject.link}', '_blank');" 
                          class="flex-1 border-2 border-dashed border-gray-200 hover:border-emerald-500 rounded-xl p-2 text-center font-mono font-bold text-gray-700 bg-gray-50 text-xs cursor-pointer select-none transition-colors">
-                        ${coupon.code}
+                        ${dataObject.code}
                     </div>
-                    <a href="${coupon.link}" target="_blank" class="bg-gray-900 text-white text-xs font-semibold px-3 py-2.5 rounded-xl hover:bg-gray-800 transition-colors shrink-0">
+                    <a href="${dataObject.link}" target="_blank" class="bg-gray-900 text-white text-xs font-semibold px-3 py-2.5 rounded-xl hover:bg-gray-800 transition-colors shrink-0">
                         Open Link
                     </a>
                 </div>
             `;
-            chatBox.appendChild(card);
+            targetChatBox.appendChild(templateCard);
         }
     </script>
 </body>
