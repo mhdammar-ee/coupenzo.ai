@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coupenzo.ai - Live Coupon Chatbot</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { background-color: #ffffff; font-family: sans-serif; }
     </style>
@@ -14,7 +14,7 @@
 
     <header class="p-4 border-b border-gray-100 flex items-center justify-between">
         <h1 class="text-xl font-bold text-gray-800 tracking-tight">coupenzo<span class="text-emerald-500">.ai</span></h1>
-        <span class="text-xs bg-emerald-50 text-emerald-600 px-2 py-1 rounded-full font-medium">Supabase Database Live</span>
+        <span class="text-xs bg-emerald-50 text-emerald-600 px-2 py-1 rounded-full font-medium">Supabase Connected</span>
     </header>
 
     <main id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4">
@@ -35,14 +35,12 @@
     </form>
 
     <script>
-        // Your real project URL built from your Project ID
+        // Setup credentials
         const myProjectUrl = "https://mjdarfyzednoohsiasgk.supabase.co";
-        
-        // CRITICAL: Paste your long anon key string inside these quotes (starts with eyJ...)
         const myAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qZGFyZnl6ZWRub29oc2lhc2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTU0MzEsImV4cCI6MjA5ODEzMTQzMX0.5lavKvNNmAZPEB_LVME1BgGNfC6J9uMHhvqQ9Oi6WXo";
         
-        // Connecting using clean, non-duplicate variable names
-        const dbClient = Supabase.createClient(myProjectUrl, myAnonKey);
+        // This initialization is now entirely safe because the library script is in the HTML head block
+        const dbClient = supabase.createClient(myProjectUrl, myAnonKey);
 
         const targetChatBox = document.getElementById('chat-box');
         const targetChatForm = document.getElementById('chat-form');
@@ -50,19 +48,18 @@
 
         targetChatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
             const searchPhrase = targetUserInput.value.trim();
             if (!searchPhrase) return;
 
-            // Append the message typed by user
             displayMessage(searchPhrase, true);
             targetUserInput.value = '';
 
-            // Show a clean loading indicator
             const loadingTrackerId = displayLoadingBubble();
             targetChatBox.scrollTop = targetChatBox.scrollHeight;
 
             try {
-                // STEP 1: Fetch store matching the exact layout case
+                // STEP 1: Fetch store data from 'Stores' table
                 const { data: matchedStore, error: storeFetchError } = await dbClient
                     .from('Stores')
                     .select('id, name, tracking_ur')
@@ -73,13 +70,12 @@
                     throw new Error("Store could not be found");
                 }
 
-                // STEP 2: Fetch related items from Coupons table
+                // STEP 2: Fetch corresponding coupons from 'Coupons' table
                 const { data: activeCoupons, error: couponFetchError } = await dbClient
                     .from('Coupons')
                     .select('name, offer, coupon_co, tracking_ur')
                     .eq('store', matchedStore.id);
 
-                // Clean up the loading bubble safely
                 const loaderNode = document.getElementById(loadingTrackerId);
                 if (loaderNode) loaderNode.remove();
 
@@ -88,7 +84,7 @@
                     return;
                 }
 
-                // STEP 3: Display results
+                // STEP 3: Display matching coupons
                 displayMessage(`Here are the latest verified offers found for **${matchedStore.name}**:`, false);
                 
                 activeCoupons.forEach(deal => {
