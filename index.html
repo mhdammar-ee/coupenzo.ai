@@ -4,244 +4,333 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Questly helps brands become visible, trusted, and cited across AI search." />
-    <title>Questly — Get cited effortlessly</title>
-    
+    <title>Coupenzo.ai — Get cited effortlessly</title>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.400.0/dist/umd/lucide.min.js"></script>
+
     <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/bb5de19d87c09a95216dc6ccd96e37c6?family=Nimbus+Sans+TW01" />
+
     <style>
-        body { 
-            background-color: #fcfcf9; 
-            font-family: 'Nimbus Sans TW01', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-width: 320px;
+            min-height: 100%;
             scroll-behavior: smooth;
+        }
+        * {
+            font-family: 'Nimbus Sans TW01', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            background: #eef2eb;
+            color: #142019;
+        }
+        ::selection {
+            color: #102116;
+            background: rgba(182, 238, 159, 0.72);
+        }
+        
+        /* Custom Keyframe Layout Animations */
+        @keyframes fade-up {
+            0% { opacity: 0; transform: translateY(24px); filter: blur(6px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes fade-down {
+            0% { opacity: 0; transform: translateY(-16px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes hero-rise {
+            0% { opacity: 0; transform: translateY(64px) scale(0.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-fade-up { opacity: 0; animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-down { opacity: 0; animation: fade-down 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-hero-rise { opacity: 0; animation: hero-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animate-fade-up, .animate-fade-down, .animate-hero-rise {
+                opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important;
+            }
         }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 2px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #dcdfd9; border-radius: 2px; }
     </style>
 </head>
-<body class="bg-zinc-50 text-zinc-800 antialiased h-screen flex flex-col lg:flex-row overflow-hidden">
+<body>
 
-    <header class="lg:hidden w-full bg-white border-b border-zinc-100 p-4 flex items-center justify-between z-50 shrink-0">
-        <h1 class="text-xl font-bold tracking-tight text-zinc-900">coupenzo<span class="text-emerald-500">.ai</span></h1>
-        <button id="menu-toggle" class="p-2 text-zinc-500 hover:text-zinc-900 focus:outline-none cursor-pointer">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
-    </header>
+    <section class="relative min-h-[100svh] overflow-hidden bg-cover bg-center flex flex-col" 
+             style="background-image: url('https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260611_133301_d5f2a94a-b22e-4e4a-a6b6-eacdddf1f5b0.png&w=1280&q=85');">
+        
+        <div class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(245,248,240,0.16)_0%,rgba(241,246,237,0.04)_48%,rgba(224,235,217,0.18)_100%)]"></div>
+        <div class="pointer-events-none absolute left-1/2 top-[24%] z-0 h-[380px] w-[760px] -translate-x-1/2 rounded-full bg-white/20 blur-[100px]"></div>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 -translate-x-full lg:translate-x-0 lg:static w-72 lg:w-80 bg-white border-r border-zinc-100 flex flex-col justify-between z-40 transition-transform duration-300 ease-in-out shrink-0 shadow-xl lg:shadow-none">
-        <div class="flex flex-col h-full">
-            <div class="hidden lg:flex p-6 border-b border-zinc-50 items-center justify-between">
-                <h1 class="text-2xl font-extrabold tracking-tight text-zinc-900">coupenzo<span class="text-emerald-500">.ai</span></h1>
-                <span class="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium border border-emerald-100">Live</span>
+        <header class="animate-fade-down relative z-50 w-full px-5 sm:px-8 lg:px-10 py-4 sm:py-5 flex items-center justify-between">
+            <a href="/" class="group inline-flex items-center gap-2.5 text-[#142019]">
+                <span class="grid size-9 place-items-center rounded-[12px] bg-[#17221b] text-white shadow-lg transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105">
+                    <svg class="size-[19px]" viewBox="0 0 256 256" fill="currentColor"><path d="M 144 256 L 27.598 256 L 144 139.598 Z M 256 207.5 L 200 256 L 200 56 L 0 56 L 48 0 L 256 0 Z M 0 204.402 L 0 112 L 92.402 112 Z"/></svg>
+                </span>
+                <span class="text-[20px] font-semibold tracking-[-0.045em]">Coupenzo<span class="text-emerald-600">.ai</span></span>
+            </a>
+
+            <nav class="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-white/55 bg-white/35 p-1.5 shadow-sm backdrop-blur-xl md:flex">
+                <a href="#toolkit" class="group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-[#344239] hover:bg-white/65 hover:text-[#111b15]">
+                    Toolkit <i data-lucide="chevron-down" class="size-3.5"></i>
+                </a>
+                <a href="#plans" class="inline-flex h-9 items-center rounded-full px-4 text-sm font-medium text-[#344239] hover:bg-white/65 hover:text-[#111b15]">Plans</a>
+                <a href="#news" class="inline-flex h-9 items-center rounded-full px-4 text-sm font-medium text-[#344239] hover:bg-white/65 hover:text-[#111b15]">News</a>
+            </nav>
+
+            <div class="hidden items-center gap-2.5 md:flex">
+                <a href="#start" class="rounded-full bg-[#17221b] px-5 py-2.5 text-sm font-medium text-white shadow-md hover:-translate-y-0.5 hover:bg-[#233129] transition-all">Start free</a>
             </div>
-            <div class="flex-1 p-6 overflow-y-auto custom-scroll">
-                <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">Recent Searches</h3>
-                <div id="history-container" class="space-y-1">
-                    <p id="empty-history-text" class="text-xs text-zinc-400 font-light italic p-2">Your verified search history will populate right here.</p>
+
+            <button id="mobile-menu-btn" class="grid size-10 place-items-center rounded-full border border-white/60 bg-white/45 text-[#17221b] backdrop-blur-xl md:hidden cursor-pointer">
+                <i data-lucide="menu" id="menu-icon" class="size-5"></i>
+            </button>
+
+            <div id="mobile-dropdown" class="hidden absolute left-4 right-4 top-[calc(100%-2px)] rounded-[26px] border border-white/70 bg-white/90 p-2 shadow-2xl backdrop-blur-2xl md:hidden">
+                <nav class="flex flex-col">
+                    <a href="#toolkit" class="flex items-center justify-between rounded-[18px] px-4 py-3.5 text-[15px] font-medium text-[#26342b] hover:bg-[#edf2e9]">Toolkit <i data-lucide="chevron-down" class="size-4"></i></a>
+                    <a href="#plans" class="flex items-center justify-between rounded-[18px] px-4 py-3.5 text-[15px] font-medium text-[#26342b] hover:bg-[#edf2e9]">Plans</a>
+                    <a href="#news" class="flex items-center justify-between rounded-[18px] px-4 py-3.5 text-[15px] font-medium text-[#26342b] hover:bg-[#edf2e9]">News</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="relative z-20 flex flex-1 flex-col items-center px-4 pt-7 sm:px-6 sm:pt-9 lg:px-8 lg:pt-10">
+            <div class="flex w-full flex-col items-center text-center">
+                <h1 class="text-[40px] min-[400px]:text-[44px] sm:text-6xl lg:text-7xl xl:text-[80px] font-semibold leading-[0.91] tracking-[-0.064em] text-[#142019]">
+                    <span class="animate-fade-up block">Get cited.</span>
+                    <span class="animate-fade-up [animation-delay:100ms] block">Effortlessly.</span>
+                </h1>
+
+                <form id="search-form" class="animate-fade-up [animation-delay:220ms] w-full max-w-xl bg-white/60 backdrop-blur-md ring-1 ring-gray-200/50 pl-5 pr-1.5 py-1.5 rounded-full mt-7 sm:mt-8 shadow-xl transition-all duration-300 focus-within:bg-white/75 focus-within:ring-white/80">
+                    <div class="flex items-center gap-3">
+                        <input id="brand-input" type="text" required placeholder="Type a brand name (e.g., Geekbuying, Gamivo)..."
+                               class="h-11 min-w-0 flex-1 border-0 bg-transparent text-[15px] font-medium text-[#1e2c23] outline-none placeholder:font-normal placeholder:text-[#788279] sm:h-12 sm:text-base" />
+                        <button type="submit" class="group grid size-11 shrink-0 place-items-center rounded-full bg-[#17221b] text-white shadow-md hover:-translate-y-0.5 hover:scale-105 transition-all cursor-pointer">
+                            <i data-lucide="arrow-up" class="size-[19px]"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <p class="animate-fade-up [animation-delay:340ms] text-gray-600 text-sm sm:text-base lg:text-lg max-w-md mt-4 text-balance leading-relaxed">
+                    See where your brand appears in AI answers, then turn every opportunity into a citation. 
+                    <span class="inline-flex translate-y-[2px] items-center gap-1 font-medium text-[#46634c]">
+                        <i data-lucide="sparkles" class="size-[0.95em] text-amber-500 fill-amber-500/20"></i> No guesswork.
+                    </span>
+                </p>
+            </div>
+
+            <div id="dashboard-anchor" class="relative z-20 mt-7 w-full max-w-[896px] sm:mt-9 lg:mt-10 animate-hero-rise [animation-delay:460ms]">
+                <div class="overflow-hidden rounded-[28px] border border-white/75 bg-white/95 shadow-2xl ring-1 ring-[#273c2d]/10 backdrop-blur-xl text-left flex flex-col">
+                    
+                    <div class="flex h-[42px] items-center border-b border-[#e9ece7] bg-[#f8faf7] px-4 shrink-0">
+                        <div class="flex items-center gap-1.5">
+                            <span class="size-2.5 rounded-full bg-[#ff7a6b]"></span>
+                            <span class="size-2.5 rounded-full bg-[#f5c95f]"></span>
+                            <span class="size-2.5 rounded-full bg-[#7cca75]"></span>
+                        </div>
+                        <div class="mx-auto flex h-6 w-[318px] items-center justify-center gap-1.5 rounded-[7px] border border-[#e4e8e1] bg-white px-3 text-[9px] font-medium text-[#899087] shadow-sm">
+                            <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            app.coupenzo.ai/overview
+                        </div>
+                        <i data-lucide="more-horizontal" class="size-4 text-[#9aa099]"></i>
+                    </div>
+
+                    <div class="flex h-[414px]">
+                        <aside class="flex w-[24%] shrink-0 flex-col border-r border-[#e7eae5] bg-[#f5f7f3] p-3">
+                            <div class="flex items-center gap-2 rounded-[12px] border border-[#e2e6df] bg-white px-2.5 py-2 shadow-sm">
+                                <div class="grid size-7 place-items-center rounded-[9px] bg-[#17221b] text-white"><i data-lucide="globe" class="size-3.5"></i></div>
+                                <div class="min-w-0 flex-1">
+                                    <p id="sb-store-name" class="truncate text-[10px] font-semibold text-[#1e2b23]">Workspace Console</p>
+                                    <p id="sb-store-url" class="truncate text-[8px] text-[#879087]">coupenzo.ai</p>
+                                </div>
+                                <i data-lucide="chevron-down" class="size-3 text-[#929991]"></i>
+                            </div>
+
+                            <div class="mt-4 space-y-1">
+                                <button class="flex w-full items-center gap-2 rounded-[9px] bg-[#e6eee1] px-2.5 py-2 text-left text-[10px] font-semibold text-[#1f3024]"><i data-lucide="bar-chart-3" class="size-3.5"></i> Overview</button>
+                                <button class="flex w-full items-center gap-2 rounded-[9px] px-2.5 py-2 text-left text-[10px] font-medium text-[#626c63]"><i data-lucide="target" class="size-3.5"></i> Opportunities <span id="badge-count" class="ml-auto rounded-full bg-[#dff0d7] px-1.5 py-0.5 text-[8px] font-semibold text-[#3f7043]">0</span></button>
+                                <button class="flex w-full items-center gap-2 rounded-[9px] px-2.5 py-2 text-left text-[10px] font-medium text-[#626c63]"><i data-lucide="file-text" class="size-3.5"></i> Content</button>
+                            </div>
+
+                            <div class="mt-4">
+                                <p class="text-[8px] font-semibold uppercase tracking-[0.14em] text-[#9ba199] px-2 mb-2">Workspace</p>
+                                <div class="space-y-0.5 text-[#707970] text-[9px] font-medium">
+                                    <div class="flex items-center gap-2 px-2 py-1 bg-white/40 rounded"><i data-lucide="folder-open" class="size-3 text-[#557b4f]"></i> <span>Tracked prompts</span></div>
+                                </div>
+                            </div>
+                        </aside>
+
+                        <main class="min-w-0 flex-1 overflow-hidden bg-[#fbfcfa] flex flex-col">
+                          <div class="flex h-[50px] items-center border-b border-[#e9ece7] px-4 shrink-0 justify-between">
+                              <div>
+                                <p class="text-[12px] font-semibold text-[#1c2820]">Visibility Overview</p>
+                                <p id="db-status-bar" class="text-[8px] text-[#8a9189]">Ready for database operational streaming.</p>
+                              </div>
+                              <span class="rounded-full border border-[#d7e5d1] bg-[#edf6e9] px-2 py-0.5 text-[7px] font-bold uppercase tracking-[0.1em] text-[#4b7849]">Supabase live</span>
+                          </div>
+
+                          <div class="p-4 flex-1 flex flex-col space-y-3 min-h-0 overflow-y-auto custom-scroll">
+                              <div class="grid grid-cols-3 gap-2.5 shrink-0">
+                                  <div class="border border-[#e6e9e3] bg-white rounded-[14px] p-3">
+                                      <div class="grid size-6 place-items-center rounded-[7px] bg-[#17221b] text-white"><i data-lucide="trending-up" class="size-3"></i></div>
+                                      <p class="text-[9px] font-medium text-[#788077] mt-2">Active Sync Status</p>
+                                      <p id="m-sync" class="text-[18px] font-bold text-[#1b251f] mt-0.5">READY</p>
+                                  </div>
+                                  <div class="border border-[#e6e9e3] bg-white rounded-[14px] p-3">
+                                      <div class="grid size-6 place-items-center rounded-[7px] bg-[#17221b] text-white"><i data-lucide="check" class="size-3"></i></div>
+                                      <p class="text-[9px] font-medium text-[#788077] mt-2">Vouchers Mapped</p>
+                                      <p id="m-count" class="text-[18px] font-bold text-[#1b251f] mt-0.5">0</p>
+                                  </div>
+                                  <div class="border border-[#e6e9e3] bg-white rounded-[14px] p-3">
+                                      <div class="grid size-6 place-items-center rounded-[7px] bg-[#17221b] text-white"><i data-lucide="target" class="size-3"></i></div>
+                                      <p class="text-[9px] font-medium text-[#788077] mt-2">Relational Status</p>
+                                      <p class="text-[18px] font-bold text-[#1b251f] mt-0.5">ACTIVE</p>
+                                  </div>
+                              </div>
+
+                              <div class="border border-[#e4e8e2] bg-white rounded-xl flex-1 flex flex-col min-h-0 overflow-hidden">
+                                  <div class="grid grid-cols-[1.5fr_2fr_1.5fr] bg-[#fafbf9] border-b border-[#eef0ed] px-3 py-2 text-[7px] font-bold uppercase tracking-wider text-zinc-400">
+                                      <span>COUPON TITLE</span>
+                                      <span>OFFER VALUE DESCRIPTION</span>
+                                      <span class="text-right">VOUCHER CODE</span>
+                                  </div>
+                                  <div id="coupons-table-body" class="flex-1 overflow-y-auto divide-y divide-zinc-100 custom-scroll">
+                                      <div class="h-full flex items-center justify-center p-8 text-center text-[10px] text-zinc-400 font-light italic">
+                                          Search a brand name inside the main search pill box above.
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                        </main>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="p-6 bg-zinc-50/50 border-t border-zinc-100">
-            <div class="flex items-center gap-2.5">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <p class="text-xs text-zinc-500 font-medium tracking-wide">Relational Engine Connected</p>
-            </div>
-        </div>
-    </aside>
+        </main>
 
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 z-30 hidden transition-opacity duration-300 lg:hidden"></div>
-
-    <main class="flex-1 flex flex-col h-full bg-white relative overflow-hidden">
-        <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll pb-24">
-            <div class="flex items-start gap-3 max-w-[85%]">
-                <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm select-none">AI</div>
-                <div class="bg-zinc-50 text-zinc-800 rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed shadow-sm border border-zinc-100/50">
-                    👋 Hello! Welcome back to Coupenzo.ai. Type any brand name from your database (like <span class="font-semibold text-emerald-600">Geekbuying</span> or <span class="font-semibold text-emerald-600">Gamivo</span>) to instantly pull live deals and coupons!
-                </div>
-            </div>
-        </div>
-
-        <div class="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
-            <form id="chat-form" class="max-w-2xl mx-auto flex gap-2 bg-white p-1.5 border border-zinc-200/80 rounded-2xl shadow-lg shadow-zinc-100/50 pointer-events-auto transition-all duration-300 focus-within:border-emerald-500/50 focus-within:shadow-emerald-50/30">
-                <input type="text" id="user-input" placeholder="Type a brand name..." required autoComplete="off"
-                       class="flex-1 px-4 py-3 bg-transparent text-sm text-zinc-800 font-normal focus:outline-none">
-                <button type="submit" 
-                        class="bg-zinc-900 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors duration-200 cursor-pointer shadow-sm shrink-0">
-                    Search
-                </button>
-            </form>
-        </div>
-    </main>
+        <img src="https://res.cloudinary.com/dy5er7kv5/image/upload/q_auto/f_auto/v1781191264/grass_eam204.png" 
+             alt="" class="pointer-events-none absolute bottom-0 left-0 z-30 w-full select-none transform translate-y-[2px]" />
+    </section>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            if (typeof supabase === 'undefined') {
-                console.error("Supabase CDN delay framework asset tracking failed.");
-                return;
+            // Initialize Lucide Icons
+            lucide.createIcons();
+
+            // Setup Mobile Menu Toggles
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileDropdown = document.getElementById('mobile-dropdown');
+            if(mobileBtn && mobileDropdown) {
+                mobileBtn.addEventListener('click', () => {
+                    mobileDropdown.classList.toggle('hidden');
+                });
             }
 
+            // Supabase API Connection Framework
             const myProjectUrl = "https://mjdarfyzednoohsiasgk.supabase.co";
             const myAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qZGFyZnl6ZWRub29oc2lhc2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTU0MzEsImV4cCI6MjA5ODEzMTQzMX0.5lavKvNNmAZPEB_LVME1BgGNfC6J9uMHhvqQ9Oi6WXo";
             const dbClient = supabase.createClient(myProjectUrl, myAnonKey);
 
-            const targetChatBox = document.getElementById('chat-box');
-            const targetChatForm = document.getElementById('chat-form');
-            const targetUserInput = document.getElementById('user-input');
-            const menuToggle = document.getElementById('menu-toggle');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebar-overlay');
-            const historyContainer = document.getElementById('history-container');
-            const emptyHistoryText = document.getElementById('empty-history-text');
+            const searchForm = document.getElementById('search-form');
+            const brandInput = document.getElementById('brand-input');
+            const tableBody = document.getElementById('coupons-table-body');
 
-            let searchHistorySet = new Set();
+            // Workspace Dashboard Visual Bindings
+            const sbStoreName = document.getElementById('sb-store-name');
+            const sbStoreUrl = document.getElementById('sb-store-url');
+            const dbStatusBar = document.getElementById('db-status-bar');
+            const mSync = document.getElementById('m-sync');
+            const mCount = document.getElementById('m-count');
+            const badgeCount = document.getElementById('badge-count');
 
-            function toggleMobileMenu() {
-                sidebar.classList.toggle('-translate-x-full');
-                sidebarOverlay.classList.toggle('hidden');
-            }
-            if(menuToggle) menuToggle.addEventListener('click', toggleMobileMenu);
-            if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleMobileMenu);
-
-            function updateHistoryUi(brandName) {
-                const formattedBrand = brandName.trim();
-                if (searchHistorySet.has(formattedBrand.toLowerCase())) return;
-                
-                searchHistorySet.add(formattedBrand.toLowerCase());
-                if (emptyHistoryText) emptyHistoryText.remove();
-
-                const historyBtn = document.createElement('button');
-                historyBtn.className = "w-full text-left text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 px-3 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 cursor-pointer group";
-                historyBtn.innerHTML = `
-                    <svg class="w-3.5 h-3.5 text-zinc-400 group-hover:text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span class="truncate">${formattedBrand}</span>
-                `;
-                
-                historyBtn.addEventListener('click', () => {
-                    if (!sidebar.classList.contains('-translate-x-full')) toggleMobileMenu();
-                    executeDatabaseQuerySearch(formattedBrand);
-                });
-
-                historyContainer.insertBefore(historyBtn, historyContainer.firstChild);
-            }
-
-            targetChatForm.addEventListener('submit', (e) => {
+            searchForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const searchPhrase = targetUserInput.value.trim();
-                if (!searchPhrase) return;
-                targetUserInput.value = '';
-                executeDatabaseQuerySearch(searchPhrase);
-            });
+                const cleanQuery = brandInput.value.trim();
+                if (!cleanQuery) return;
 
-            async function executeDatabaseQuerySearch(searchPhrase) {
-                displayMessage(searchPhrase, true);
-                const loadingTrackerId = displayLoadingBubble();
-                targetChatBox.scrollTop = targetChatBox.scrollHeight;
+                dbStatusBar.innerText = "Querying secure record matches...";
+                tableBody.innerHTML = `<div class="h-full flex items-center justify-center p-8 text-center text-[10px] text-zinc-400 font-light italic animate-pulse">Syncing layout components...</div>`;
+                
+                // Smooth offset scroll targeting lower window mockup space
+                document.getElementById('dashboard-anchor').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 try {
-                    const { data: matchedStoreArray, error: storeFetchError } = await dbClient
+                    // STEP 1: Search Stores Table
+                    const { data: stores, error: storeErr } = await dbClient
                         .from('Stores')
                         .select('id, name, tracking_url')
-                        .ilike('name', `%${searchPhrase}%`);
+                        .ilike('name', `%${cleanQuery}%`);
 
-                    if (storeFetchError || !matchedStoreArray || matchedStoreArray.length === 0) {
-                        throw new Error("Store could not be found");
+                    if (storeErr || !stores || stores.length === 0) {
+                        throw new Error("Store data not found");
                     }
 
-                    const currentStore = matchedStoreArray[0];
-                    const storeIdToFind = currentStore.id;
+                    const targetStore = stores[0];
+                    sbStoreName.innerText = targetStore.name;
+                    sbStoreUrl.innerText = targetStore.tracking_url ? targetStore.tracking_url.replace("https://", "").split('/')[0] : "live-link.com";
 
-                    updateHistoryUi(currentStore.name);
-
-                    const { data: activeCoupons, error: couponFetchError } = await dbClient
+                    // STEP 2: Query Related Coupons via matching ID
+                    const { data: coupons, error: couponErr } = await dbClient
                         .from('Coupons')
                         .select('name, offer, coupon_code, tracking_url, store')
-                        .eq('store', storeIdToFind);
+                        .eq('store', targetStore.id);
 
-                    const loaderNode = document.getElementById(loadingTrackerId);
-                    if (loaderNode) loaderNode.remove();
-
-                    if (couponFetchError || !activeCoupons || activeCoupons.length === 0) {
-                        displayMessage(`I found the store **${currentStore.name}**, but there are no active coupon codes assigned to its ID data right now.`, false);
+                    if (couponErr || !coupons || coupons.length === 0) {
+                        mSync.innerText = "0%";
+                        mCount.innerText = "0";
+                        badgeCount.innerText = "0";
+                        dbStatusBar.innerText = `Index Sync Empty for ${targetStore.name}`;
+                        tableBody.innerHTML = `<div class="h-full flex items-center justify-center p-8 text-center text-[10px] text-zinc-400 font-light italic">No active vouchers mapped to this brand row yet.</div>`;
                         return;
                     }
 
-                    displayMessage(`Here are the latest verified offers found for **${currentStore.name}**:`, false);
+                    // STEP 3: Update counters and populate rows
+                    mSync.innerText = "100%";
+                    mCount.innerText = coupons.length;
+                    badgeCount.innerText = coupons.length;
+                    dbStatusBar.innerText = `Successfully loaded ${coupons.length} offers cleanly.`;
                     
-                    activeCoupons.forEach(deal => {
-                        const trackingLink = deal.tracking_url || currentStore.tracking_url || "https://www.google.com";
-                        buildCouponUiCard({
-                            discount: deal.name || "DEAL",       
-                            title: deal.offer || "Special Offer", 
-                            code: deal.coupon_code || "GET DEAL",  
-                            link: trackingLink
+                    tableBody.innerHTML = "";
+                    coupons.forEach(row => {
+                        const directUrl = row.tracking_url || targetStore.tracking_url || "https://google.com";
+                        const trRow = document.createElement('div');
+                        trRow.className = "grid grid-cols-[1.6fr_1.9fr_1.5fr] items-center px-3 py-3 text-[9px] transition-colors hover:bg-zinc-50/80 cursor-pointer";
+                        trRow.innerHTML = `
+                            <span class="font-bold text-emerald-600 tracking-wide truncate pr-2">${row.name || 'OFFER'}</span>
+                            <span class="font-medium text-zinc-700 truncate pr-2">${row.offer || 'Verified Promotion Deal'}</span>
+                            <div class="text-right">
+                                <span class="inline-block bg-zinc-50 px-2 py-1 rounded border border-dashed border-zinc-300 font-mono font-bold text-zinc-800 text-[8px] hover:border-emerald-500 transition-colors">
+                                    ${row.coupon_code || 'GET DEAL'}
+                                </span>
+                            </div>
+                        `;
+                        
+                        trRow.addEventListener('click', () => {
+                            navigator.clipboard.writeText(row.coupon_code || 'GET DEAL');
+                            alert(`Code: "${row.coupon_code}" copied to clipboard! Opening link...`);
+                            window.open(directUrl, '_blank');
                         });
+                        tableBody.appendChild(trRow);
                     });
 
-                } catch (runtimeError) {
-                    const loaderNode = document.getElementById(loadingTrackerId);
-                    if (loaderNode) loaderNode.remove();
-                    displayMessage(`I searched our database for "${searchPhrase}" but couldn't find a matching store name. Check your spelling or table entries!`, false);
+                } catch (error) {
+                    mSync.innerText = "0%";
+                    mCount.innerText = "0";
+                    badgeCount.innerText = "0";
+                    sbStoreName.innerText = "Not Found";
+                    sbStoreUrl.innerText = "mismatch";
+                    dbStatusBar.innerText = "Returned empty or mismatch indexes.";
+                    tableBody.innerHTML = `<div class="h-full flex items-center justify-center p-8 text-center text-[10px] text-red-400 font-light italic">Searched for "${cleanQuery}" but couldn't find a matching store. Check spelling!</div>`;
                 }
-
-                setTimeout(() => {
-                    targetChatBox.scrollTo({ top: targetChatBox.scrollHeight, behavior: 'smooth' });
-                }, 50);
-            }
-
-            function displayMessage(textBody, isUserSender) {
-                const rowWrapper = document.createElement('div');
-                rowWrapper.className = isUserSender ? "flex items-start justify-end gap-3 w-full" : "flex items-start gap-3 max-w-xl";
-                
-                const avatar = document.createElement('div');
-                avatar.className = isUserSender ? "hidden" : "w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm select-none";
-                avatar.innerText = "AI";
-
-                const messageBubble = document.createElement('div');
-                messageBubble.className = isUserSender 
-                    ? "bg-zinc-900 text-white rounded-2xl rounded-tr-sm p-4 text-sm leading-relaxed shadow-md max-w-[85%]" 
-                    : "bg-zinc-50 text-zinc-800 rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed shadow-sm border border-zinc-100/50";
-                
-                messageBubble.innerHTML = textBody.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold text-emerald-500">$1</strong>');
-                
-                if(!isUserSender) rowWrapper.appendChild(avatar);
-                rowWrapper.appendChild(messageBubble);
-                targetChatBox.appendChild(rowWrapper);
-            }
-
-            function displayLoadingBubble() {
-                const targetId = 'load-' + Date.now();
-                const loadingRow = document.createElement('div');
-                loadingRow.id = targetId;
-                loadingRow.className = "flex items-start gap-3 max-w-xl animate-pulse";
-                loadingRow.innerHTML = `
-                    <div class="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-400 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-                    <div class="bg-zinc-50 text-zinc-400 rounded-2xl rounded-tl-sm p-4 text-sm border border-zinc-100/50 italic">Searching database fields...</div>
-                `;
-                targetChatBox.appendChild(loadingRow);
-                return targetId;
-            }
-
-            function buildCouponUiCard(dataObject) {
-                const templateCard = document.createElement('div');
-                templateCard.className = "border border-zinc-200/80 rounded-2xl p-5 bg-white max-w-md ml-11 shadow-sm border-l-4 border-l-emerald-500 my-3";
-                templateCard.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-emerald-600 font-extrabold text-sm tracking-wider uppercase">${dataObject.discount}</span>
-                        <span class="text-[10px] text-zinc-400 font-medium bg-zinc-50 px-2 py-0.5 rounded border border-zinc-100">VERIFIED TODAY</span>
-                    </div>
-                    <h3 class="text-sm font-semibold text-zinc-900 mb-4 leading-snug">${dataObject.title}</h3>
-                    <div class="flex gap-2 items-center">
-                        <div onclick="navigator.clipboard.writeText('${dataObject.code}'); alert('Coupon code copied! Opening tracking url...'); window.open('${dataObject.link}', '_blank');" 
-                             class="flex-1 border border-dashed border-zinc-300 hover:border-emerald-500 hover:bg-emerald-50/20 rounded-xl p-2.5 text-center font-mono font-bold text-zinc-700 bg-zinc-50 text-xs cursor-pointer select-none transition-all">
-                            ${dataObject.code}
-                        </div>
-                        <a href="${dataObject.link}" target="_blank" class="bg-zinc-900 text-white text-xs font-semibold px-4 py-3 rounded-xl hover:bg-emerald-600 transition-colors shrink-0 shadow-sm">Open Offer</a>
-                    </div>
-                `;
-                targetChatBox.appendChild(templateCard);
-            }
+            });
         });
     </script>
 </body>
