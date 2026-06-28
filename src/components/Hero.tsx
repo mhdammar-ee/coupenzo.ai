@@ -1,1 +1,117 @@
-import { ArrowUp, Sparkles } from "lucide-react"; import DashboardMockup from "./DashboardMockup"; import Navbar from "./Navbar"; const heroBackground = "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260611_133301_d5f2a94a-b22e-4e4a-a6b6-eacdddf1f5b0.png&w=1280&q=85"; const grassForeground = "https://res.cloudinary.com/dy5er7kv5/image/upload/q_auto/f_auto/v1781191264/grass_eam204.png"; export default function Hero() { return ( <section className="relative min-h-[100svh] overflow-hidden bg-cover bg-center flex flex-col" style={{ backgroundImage: `url("${heroBackground}")` }} > <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(245,248,240,0.16)_0%,rgba(241,246,237,0.04)_48%,rgba(224,235,217,0.18)_100%)]" aria-hidden="true" /> <div className="pointer-events-none absolute left-1/2 top-[24%] z-0 h-[380px] w-[760px] -translate-x-1/2 rounded-full bg-white/20 blur-[100px]" aria-hidden="true" /> <Navbar /> <main className="relative z-20 flex flex-1 flex-col items-center px-4 pt-7 sm:px-6 sm:pt-9 lg:px-8 lg:pt-10"> <div className="flex w-full flex-col items-center text-center"> <h1 className="text-[40px] min-[400px]:text-[44px] sm:text-6xl lg:text-7xl xl:text-[80px] font-semibold leading-[0.91] tracking-[-0.064em] text-[#142019]"> <span className="animate-fade-up block">Get cited.</span> <span className="animate-fade-up [animation-delay:100ms] block"> Effortlessly. </span> </h1> <form className="animate-fade-up [animation-delay:220ms] w-full max-w-xl bg-white/60 backdrop-blur-md ring-1 ring-gray-200/50 pl-5 pr-1.5 py-1.5 rounded-full mt-7 sm:mt-8 shadow-[0_16px_55px_rgba(36,56,43,0.12)] transition-all duration-300 focus-within:bg-white/75 focus-within:ring-white/80 focus-within:shadow-[0_20px_65px_rgba(36,56,43,0.16)]" onSubmit={(event) => event.preventDefault()} > <label htmlFor="questly-domain" className="sr-only"> Enter your website domain </label> <div className="flex items-center gap-3"> <input id="questly-domain" name="domain" type="url" inputMode="url" autoComplete="url" placeholder="Enter your website URL" className="h-11 min-w-0 flex-1 border-0 bg-transparent text-[15px] font-medium text-[#1e2c23] outline-none placeholder:font-normal placeholder:text-[#788279] sm:h-12 sm:text-base" /> <button type="submit" aria-label="Analyze website" className="group grid size-11 shrink-0 place-items-center rounded-full bg-[#17221b] text-white shadow-[0_8px_20px_rgba(27,42,33,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:bg-[#253329] active:translate-y-0 active:scale-95 sm:size-12" > <ArrowUp className="size-[19px] transition-transform duration-200 group-hover:-translate-y-0.5" strokeWidth={2.2} /> </button> </div> </form> <p className="animate-fade-up [animation-delay:340ms] text-gray-600 text-sm sm:text-base lg:text-lg max-w-md mt-4 text-balance leading-relaxed"> See where your brand appears in AI answers, then turn every opportunity into a citation.{" "} <span className="inline-flex translate-y-[2px] items-center gap-1 whitespace-nowrap font-medium text-[#46634c]"> <Sparkles className="size-[0.95em]" strokeWidth={2} aria-hidden="true" /> No guesswork. </span> </p> </div> <div className="relative z-20 mt-7 w-full max-w-[960px] sm:mt-9 lg:mt-10"> <DashboardMockup /> </div> </main> <img src={grassForeground} alt="" aria-hidden="true" draggable={false} className="pointer-events-none absolute bottom-0 left-0 z-30 w-full select-none transform translate-y-[2px]" /> </section> ); }
+import { ArrowUp, Sparkles } from "lucide-react";
+import { useState, useRef } from "react";
+import DashboardMockup from "./DashboardMockup";
+import Navbar from "./Navbar";
+
+const heroBackground =
+  "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260611_133301_d5f2a94a-b22e-4e4a-a6b6-eacdddf1f5b0.png&w=1280&q=85";
+
+const grassForeground =
+  "https://res.cloudinary.com/dy5er7kv5/image/upload/q_auto/f_auto/v1781191264/grass_eam204.png";
+
+export default function Hero() {
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const [triggerSearch, setTriggerSearch] = useState("");
+  const dashboardRef = useRef<HTMLDivElement>(null);
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!searchPhrase.trim()) return;
+    
+    // Set query value to trigger fetch in DashboardMockup child component
+    setTriggerSearch(searchPhrase.trim());
+
+    // Smooth scroll straight down to the dashboard mockup component layout window
+    setTimeout(() => {
+      dashboardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  };
+
+  return (
+    <section
+      className="relative min-h-[100svh] overflow-hidden bg-cover bg-center flex flex-col"
+      style={{ backgroundImage: `url("${heroBackground}")` }}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(245,248,240,0.16)_0%,rgba(241,246,237,0.04)_48%,rgba(224,235,217,0.18)_100%)]"
+        aria-hidden="true"
+      />
+
+      <div
+        className="pointer-events-none absolute left-1/2 top-[24%] z-0 h-[380px] w-[760px] -translate-x-1/2 rounded-full bg-white/20 blur-[100px]"
+        aria-hidden="true"
+      />
+
+      <Navbar />
+
+      <main className="relative z-20 flex flex-1 flex-col items-center px-4 pt-7 sm:px-6 sm:pt-9 lg:px-8 lg:pt-10">
+        <div className="flex w-full flex-col items-center text-center">
+          <h1 className="text-[40px] min-[400px]:text-[44px] sm:text-6xl lg:text-7xl xl:text-[80px] font-semibold leading-[0.91] tracking-[-0.064em] text-[#142019]">
+            <span className="animate-fade-up block">Get cited.</span>
+            <span className="animate-fade-up [animation-delay:100ms] block">
+              Effortlessly.
+            </span>
+          </h1>
+
+          {/* Connected Live Database Input Processing Module */}
+          <form
+            className="animate-fade-up [animation-delay:220ms] w-full max-w-xl bg-white/60 backdrop-blur-md ring-1 ring-gray-200/50 pl-5 pr-1.5 py-1.5 rounded-full mt-7 sm:mt-8 shadow-[0_16px_55px_rgba(36,56,43,0.12)] transition-all duration-300 focus-within:bg-white/75 focus-within:ring-white/80 focus-within:shadow-[0_20px_65px_rgba(36,56,43,0.16)]"
+            onSubmit={handleSubmit}
+          >
+            <label htmlFor="questly-domain" className="sr-only">
+              Enter brand name
+            </label>
+
+            <div className="flex items-center gap-3">
+              <input
+                id="questly-domain"
+                type="text"
+                value={searchPhrase}
+                onChange={(e) => setSearchPhrase(e.target.value)}
+                placeholder="Type a brand name (e.g., Geekbuying, Gamivo)..."
+                className="h-11 min-w-0 flex-1 border-0 bg-transparent text-[15px] font-medium text-[#1e2c23] outline-none placeholder:font-normal placeholder:text-[#788279] sm:h-12 sm:text-base"
+              />
+
+              <button
+                type="submit"
+                aria-label="Analyze website"
+                className="group grid size-11 shrink-0 place-items-center rounded-full bg-[#17221b] text-white shadow-[0_8px_20px_rgba(27,42,33,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:bg-[#253329] active:translate-y-0 active:scale-95 sm:size-12 cursor-pointer"
+              >
+                <ArrowUp
+                  className="size-[19px] transition-transform duration-200 group-hover:-translate-y-0.5"
+                  strokeWidth={2.2}
+                />
+              </button>
+            </div>
+          </form>
+
+          <p className="animate-fade-up [animation-delay:340ms] text-gray-600 text-sm sm:text-base lg:text-lg max-w-md mt-4 text-balance leading-relaxed">
+            See where your brand appears in AI answers, then turn every
+            opportunity into a citation.{" "}
+            <span className="inline-flex translate-y-[2px] items-center gap-1 whitespace-nowrap font-medium text-[#46634c]">
+              <Sparkles
+                className="size-[0.95em]"
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+              No guesswork.
+            </span>
+          </p>
+        </div>
+
+        <div ref={dashboardRef} className="relative z-20 mt-7 w-full max-w-[960px] sm:mt-9 lg:mt-10">
+          {/* Passed the active search phrase into the dynamic live component layer */}
+          <DashboardMockup currentSearchQuery={triggerSearch} />
+        </div>
+      </main>
+
+      <img
+        src={grassForeground}
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        className="pointer-events-none absolute bottom-0 left-0 z-30 w-full select-none transform translate-y-[2px]"
+      />
+    </section>
+  );
+}
