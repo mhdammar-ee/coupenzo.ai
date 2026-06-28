@@ -263,21 +263,19 @@
                 document.getElementById('dashboard-anchor').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 try {
-                    // STEP 1: Search Stores Table
+                    // NEW FUZZY SEARCH STEP 1: Calling the SQL function for spelling tolerance
                     const { data: stores, error: storeErr } = await dbClient
-                        .from('Stores')
-                        .select('id, name, tracking_url')
-                        .ilike('name', `%${cleanQuery}%`);
+                        .rpc('search_store_fuzzy', { search_text: cleanQuery });
 
                     if (storeErr || !stores || stores.length === 0) {
                         throw new Error("Store data not found");
                     }
 
-                    const targetStore = stores[0];
+                    const targetStore = stores[0]; // Ye sub se close matching store utha lega
                     sbStoreName.innerText = targetStore.name;
                     sbStoreUrl.innerText = targetStore.tracking_url ? targetStore.tracking_url.replace("https://", "").split('/')[0] : "live-link.com";
 
-                    // STEP 2: Query Related Coupons via matching ID
+                    // STEP 2: Query Related Coupons via matching ID (Ye pehle jaisa hi rahega)
                     const { data: coupons, error: couponErr } = await dbClient
                         .from('Coupons')
                         .select('name, offer, coupon_code, tracking_url, store')
